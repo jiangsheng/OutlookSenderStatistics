@@ -55,7 +55,7 @@ namespace OutlookSenderStatistics
             }
             catch (System.Exception ex)
             {
-                MessageBox.Show(string.Format("Outlook is not accessible, maybe it is running as administrator or have not finished loading ({0}).", ex.Message));
+                MessageBox.Show(string.Format("Outlook Classic or one of its folders is not accessible, maybe it is running as administrator, having network issues or have not finished loading ({0}).", ex.Message));
             }
         }
         CancellationTokenSource? cancellationTokenSource = new CancellationTokenSource();
@@ -321,7 +321,7 @@ namespace OutlookSenderStatistics
                 // Pass the token and progress reporter to the async task
                 await Task.Run(()=> DeleteMailBySenderTaskAsync(progress, minAgeToDelete, minSizeToDelete, canMatchPartially, senderAddressesToDelete,token));
                 this.toolStripProgressBar1.Value = 0;
-                toolStripStatusLabel1.Text = "Operation Completed!";
+                toolStripStatusLabel1.Text = "Operation Completed! If you want to undelete, check the Deleted Items folder in Outlook Classic";
             }
             catch (OperationCanceledException)
             {
