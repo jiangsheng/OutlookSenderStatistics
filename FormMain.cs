@@ -203,34 +203,52 @@ namespace OutlookSenderStatistics
             if (senderStatistics?.Count > 0)
             {
                 saveFileDialog1.FileName = "SenderStatistics.csv";
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    CsvHelper.Configuration.CsvConfiguration config = new CsvHelper.Configuration.CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
+                bool done=false;
+                while (!done)
+                { 
+                    var result = saveFileDialog1.ShowDialog();
+                    if (result == DialogResult.OK)
                     {
-                        Delimiter = ",",
-                    };
-                    using (var writer = new StreamWriter(saveFileDialog1.FileName))
-                    using (var csv = new CsvHelper.CsvWriter(writer, config))
-                    {
-                        csv.WriteField("Sender");
-                        csv.WriteField("MailCount");
-                        csv.WriteField("TotalMailSize");
-                        csv.WriteField("AverageMailSize");
-                        csv.NextRecord();
-                        foreach (var kvp in senderStatistics.OrderByDescending(kvp => kvp.Value.MailCount))
+                        try
                         {
-                            csv.WriteField(kvp.Key);
-                            csv.WriteField(kvp.Value.MailCount);
-                            csv.WriteField(kvp.Value.TotalMailSize);
-                            csv.WriteField(kvp.Value.TotalMailSize/ kvp.Value.MailCount );
-                            csv.NextRecord();
+
+                            CsvHelper.Configuration.CsvConfiguration config = new CsvHelper.Configuration.CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
+                            {
+                                Delimiter = ",",
+                            };
+                            using (var writer = new StreamWriter(saveFileDialog1.FileName))
+                            using (var csv = new CsvHelper.CsvWriter(writer, config))
+                            {
+                                csv.WriteField("Sender");
+                                csv.WriteField("MailCount");
+                                csv.WriteField("TotalMailSize");
+                                csv.WriteField("AverageMailSize");
+                                csv.NextRecord();
+                                foreach (var kvp in senderStatistics.OrderByDescending(kvp => kvp.Value.MailCount))
+                                {
+                                    csv.WriteField(kvp.Key);
+                                    csv.WriteField(kvp.Value.MailCount);
+                                    csv.WriteField(kvp.Value.TotalMailSize);
+                                    csv.WriteField(kvp.Value.TotalMailSize / kvp.Value.MailCount);
+                                    csv.NextRecord();
+                                }
+                            }
+                            Process.Start(new ProcessStartInfo()
+                            {
+                                FileName = saveFileDialog1.FileName,
+                                UseShellExecute = true
+                            }); 
+                            done = true;
+                        }
+                        catch (System.Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
                         }
                     }
-                    Process.Start(new ProcessStartInfo()
+                    else if (result == DialogResult.Cancel)
                     {
-                        FileName = saveFileDialog1.FileName,
-                        UseShellExecute = true
-                    });
+                        return;
+                    }
                 }
             }
 
